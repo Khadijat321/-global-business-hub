@@ -1,0 +1,16 @@
+{
+  "name": "global-business-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An international business discovery, visibility and networking platform.",
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "build": "pnpm --recursive --if-present build",
+    "lint": "pnpm --recursive --if-present lint",
+    "test": "pnpm --recursive --if-present test"
+  }
+}
