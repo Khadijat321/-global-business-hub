@@ -5,6 +5,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { DatabaseHealthController } from './database-health.controller.js';
+import { SecurityModule } from './security/security.module.js';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { DatabaseHealthController } from './database-health.controller.js';
       isGlobal: true,
     }),
     PrismaModule,
+    SecurityModule,
   ],
   controllers: [
   AppController,

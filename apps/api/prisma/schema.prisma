@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -7,10 +8,87 @@ datasource db {
   provider = "postgresql"
 }
 
+enum PlatformRole {
+  MEMBER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum BusinessRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum BusinessStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  fullName  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String       @id @default(uuid()) @db.Uuid
+  email           String       @unique
+  passwordHash    String
+  fullName        String?
+  platformRole    PlatformRole @default(MEMBER)
+  status          UserStatus   @default(ACTIVE)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  memberships BusinessMembership[]
+  sessions    AuthSession[]
+}
+
+model Business {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String         @unique
+  description String?
+  country     String?
+  state       String?
+  city        String?
+  website     String?
+  status      BusinessStatus @default(DRAFT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  memberships BusinessMembership[]
+}
+
+model BusinessMembership {
+  id         String       @id @default(uuid()) @db.Uuid
+  userId     String       @db.Uuid
+  businessId String       @db.Uuid
+  role       BusinessRole @default(VIEWER)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId])
+}
+
+model AuthSession {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
